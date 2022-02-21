@@ -1,6 +1,4 @@
-# lyricformatter
-#MXM: 
-https://nzwaneveld.github.io/lyricformatter/mxmformatter.html
+#Lyric Formatters
 
-#GENIUS: 
-https://nzwaneveld.github.io/lyricformatter/geniusformatter.html
+The links and work instructions are shared with members of our channel on slack.
+

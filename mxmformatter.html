@@ -1,0 +1,196 @@
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1257"/>
+<meta name="Author" content="Vincas Stepankevičius"/>
+<meta name="Version" content="5.4">
+<meta http-equiv=”date” content="29/03/2021"/>
+<meta http-equiv=”last-modified” content="29/10/2021" />
+<Title>MxM lyrics formatter</Title>
+<style>
+  body  {background-color: #EAEAE0;color: #3F3A3A;font-family: helvetica, arial;margin:1;}
+  textarea {border:"none"; width: 100%; height:100%;}
+  th {background-color: #DADAD0; padding-left:1px; }
+  td {height:100%;}
+  label {font-weight: normal; font-size: small;padding-left:0;text-align:left;}
+  span.right {float: right; padding:1 2 0 1;}
+  span.left {float: left; padding:1 1 0 2;}
+</style>
+
+<script type= "text/javascript">
+var lyrBox;
+var lyrHead;
+var theTaskLink;
+const strInfo = '1. The main function - formatting lyrics according MxM guidelines. Drag any lyrics text here to be autoformatted and copied to the clipboard.\nUse "Lang" selector to switch between different language-dependent rule-sets.\nBe careful while selecting "Fix backing vocals" checkbox - initial proper names may be lowercased.\n\n2. Additional functionality - constructing a Spotify-linked url for unsynchable mission tasks and web pages. Just drag-drop required mxm task/page & spotify track addresses here to produce a constructed url. This functionality may be switched on/off with checkbox "TogURL".\n\n3. Rarities: button "Bckwrd" may be used for text backwards-masking.'
+
+function initMe() {
+  lyrBox = document.getElementById("lyricsBox");
+  lyrHead = document.getElementById("lyrHead");
+}
+
+function reverseString(str) {
+    return str.split("").reverse().join("");
+}
+
+function showInfo() {
+  lyrBox.value =strInfo;
+}
+function DoBackwards() {
+  lyrBox.value =reverseString(lyrBox.value);
+}
+
+function togUrlVis(el) {
+  if (el.checked){linkDiv.style.display="block"}
+  else {linkDiv.style.display="none"}
+}
+
+
+function formatMe() {
+ if (lyrBox){ 
+    var lyr = "\n" + lyrBox.value.trim() + "\n";
+    lyr=lyr.replace(/\n */g,"\n"); // Indent removal
+    lyr=lyr.replace(/\n\d+\. */g,"\n"); // Initial #n. removal
+    lyr=lyr.replace(/[!]+/g,"!"); //Multiple ! fix
+    lyr=lyr.replace(/[?]+/g,"?"); //Multiple ? fix
+    lyr=lyr.replace(/ {2,}/g," "); //Multiple spaces fix
+    lyr=lyr.replace(/ /g," "); //Non-breaking space → space
+    lyr=lyr.replace(/\n\(?"?'?\S/g, function($0){return $0.toUpperCase();}); //Sentence-case formattting
+    lyr=lyr.replace(/ +([.,!?;])/g, "$1");//-space(s), preceding punctuation
+    lyr=lyr.replace(/[’´`‘]/g,"'"); //curly single apostrophe → typographic '
+    lyr=lyr.replace(/[„“”«»]/g,'"'); //curly double apostrophe → typographic "
+    lyr=lyr.replace(/\u2026/g,"..."); //Unicode ellipsis → "..."
+    lyr=lyr.replace(/(\w*?)( *[—.–,:;-]* *)*\n/g, "$1\n");//-EOL punctuation
+    lyr=lyr.replace(/([^.])\.\. /g, "$1... "); //2dots → 3dots
+    lyr=lyr.replace(/([,;])([^ ."?!\d)])/g, "$1 $2"); // +missing spaces
+
+    switch (cmbLang.value){
+      case 'en':
+        lyr=lyr.replace(/(^|[\n "])'?(til)l?(\b)/gi, "$1'$2$3"); // till → 'til
+        lyr=lyr.replace(/(?:\b)(don|ain)t(?:\b)/gi, "$1't"); // dont/aint → don't/ain't
+        lyr=lyr.replace(/([" (])i([' ])/gm, "$1I$2"); //uppercase "i"
+        break; 
+      case 'fr':
+        lyr=lyr.replace(/[!]\n/gi, '\n'); // -EOL punctuation (FR)
+        break;
+      case 'fr1':
+        lyr=lyr.replace(/[!]\n/gi, '\n'); // -EOL punctuation (FR)
+        lyr=lyr.replace(/[.!]+ (\S)?/g, function($0,$1){return ", " + $1.toLowerCase();}); //mid-line (!.) → (,)
+        lyr=lyr.replace(/[:;] /gi, ', '); // FR-punctuation
+        lyr=lyr.replace(/, (\S)?/g, function($0,$1){return ", " + $1.toLowerCase();});
+        break;
+      case 'ru':
+        lyr=lyr.replace(/([.!?] )(\S)/g, function($0,$1,$2){return $1 + $2.toUpperCase();}); //IniCap, following (.!?)
+        lyr=lyr.replace(/ [–-] /g,' — '); // dash → em-dash
+    }
+    if (chkBacks.checked){
+      lyr=lyr.replace(/(\w*[!?]) +\(('?\S)/g, function($0,$1,$2){return $1 + ' (' + $2.toUpperCase();}); //Back-vocals after !&? → IniCap
+      lyr=lyr.replace(/([^!? ]) +\(('?\S)/g, function($0,$1,$2){return $1 + ' (' + $2.toLowerCase();}); //Other back-vocals → lowerIniCase
+    }
+    lyrBox.value =lyr.trim();
+    lyrBox.onfocus = function () {
+      lyrBox.select();
+      lyrBox.onfocus = undefined;
+    } 
+    lyrBox.focus(); 
+    document.execCommand("Copy", false, null);
+  }
+}
+
+function getTaskLink(alink){
+  var m;
+  if (alink.startsWith('https://curators')){
+    theTaskLink=alink;
+    if (alink.includes('&mission_id=')){taskUrl.textContent='taskLink';}
+    else {taskUrl.textContent='editLink';}
+    m = alink.match(/commontrack_id=(\d+)/i);
+    if (m){
+      mxmID.value=m[1];
+    }
+    m = alink.match(/&track_id=(.{22})/i);
+    if (m){
+      spotID.value=m[1];
+    }
+    else{
+      spotID.value='';
+    }
+  }
+  else if (alink.startsWith('https://open.spotify.com/track/')){
+    m = alink.match(/com\/track\/(.{22})/i);
+    if (m){
+      spotID.value=m[1];
+    }
+  }
+  if (spotID.value==''){
+    taskUrl.removeAttribute('href');
+  }
+  else{
+    /*
+    if (!theTaskLink.includes('&mode=edit&player=spotify')){
+      theTaskLink += '&mode=edit&player=spotify';
+    }
+    */
+    
+    theTaskLink = theTaskLink.replace(/&track_id=(.{22})/g,"") + '&track_id=' + spotID.value;
+    taskUrl.setAttribute('href', theTaskLink);
+  }
+}
+
+function getDrop(event) {
+  const data = event.dataTransfer.getData("text/plain");
+  if (data.startsWith('https')){
+    if (togUrl.checked){getTaskLink(data);}
+  }
+  else{
+    lyrHead.focus();
+    lyrBox.value=data;
+    formatMe();
+  }
+  event.preventDefault();
+}
+
+</script>
+</HEAD>
+<BODY onload="initMe()">
+<table height ="100%" width = 100%>
+  <tr>
+    <th>
+      MxM lyrics formatter
+      <span class="right">
+      <Button id = "lyrHead" onclick="showInfo()" title="Help">?</Button>
+      </span>
+    </th>
+  </tr>
+  <tr>
+    <th>
+      <span id="linkDiv" name="linkDiv" class="left" style="display:none;">
+        <label>MxmID</label>
+        <input id="mxmID" name ="mxmID" title="MxM commontrack_id" style="width:90px;">
+        <label>SpotID</label>
+        <input id="spotID" name ="spotID" title="spotify_id" style="width:210px;">
+        <a id="taskUrl" name ="taskUrl" title="task Url" href ="https://www.musixmatch.com/">taskUrl</a>
+      </span>
+      <span class="right">
+        <label for="cmbLang">Lang:</label>
+        <select name="cmbLang" id="cmbLang">
+          <option value="-">-</option>
+          <option value="en">EN</option>
+          <option value="fr">FR</option>
+          <option value="fr1">fr</option>
+          <option value="ru">RU</option>
+        </select>
+        <Button id = "lyrBckwrds" onclick="DoBackwards()" title="Backwards text">Bckwrd</Button>
+        <label for="chkBacks">FixBacks</label>
+        <input id="chkBacks" name ="chkBacks" checked="checked" type="checkbox" title="Fix backing vocals" style="margin: 3 2 0 0;">
+        <label for="togUrl">TogURL</label>
+        <input id="togUrl" value=0 type="checkbox" title="Tog URL constructor visibility" style="margin: 3 2 0 0;" onchange="togUrlVis(this)">
+      </span>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <textarea id ="lyricsBox" ondrop = "getDrop(event)">
+      </textarea> 
+    </td>
+  </tr>
+</table>
+</BODY>
+</HTML>

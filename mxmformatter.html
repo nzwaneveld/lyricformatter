@@ -61,13 +61,13 @@ function formatMe() {
     lyr=lyr.replace(/(\w*?)( *[—.–,:;-]* *)*\n/g, "$1\n");//-EOL punctuation
     lyr=lyr.replace(/([^.])\.\. /g, "$1... "); //2dots → 3dots
     lyr=lyr.replace(/([,;])([^ ."?!\d)])/g, "$1 $2"); // +missing spaces
-
+    lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, function($0,$1){return "#" + $1.toUpperCase();});
+   
     switch (cmbLang.value){
       case 'en':
         lyr=lyr.replace(/(^|[\n "])'?(til)l?(\b)/gi, "$1'$2$3"); // till → 'til
         lyr=lyr.replace(/(?:\b)(don|ain)t(?:\b)/gi, "$1't"); // dont/aint → don't/ain't
         lyr=lyr.replace(/([" (])i([' ])/gm, "$1I$2"); //uppercase "i"
-        lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, function($0,$1){return "#" + $1.toUpperCase();});
         break; 
       case 'fr':
         lyr=lyr.replace(/[!]\n/gi, '\n'); // -EOL punctuation (FR)
@@ -181,7 +181,7 @@ function getDrop(event) {
         <label for="cmbLang">Lang:</label>
         <select name="cmbLang" id="cmbLang">
           <option value="-">-</option>
-          <option value="en">EN</option>
+          <option value="en" selected>EN</option>
           <option value="fr">FR</option>
           <option value="fr1">fr</option>
           <option value="ru">RU</option>

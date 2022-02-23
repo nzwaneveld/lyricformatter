@@ -67,6 +67,7 @@ function formatMe() {
         lyr=lyr.replace(/(^|[\n "])'?(til)l?(\b)/gi, "$1'$2$3"); // till → 'til
         lyr=lyr.replace(/(?:\b)(don|ain)t(?:\b)/gi, "$1't"); // dont/aint → don't/ain't
         lyr=lyr.replace(/([" (])i([' ])/gm, "$1I$2"); //uppercase "i"
+        lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, function($0,$1){return "#" + $1.toUpperCase();});
         break; 
       case 'fr':
         lyr=lyr.replace(/[!]\n/gi, '\n'); // -EOL punctuation (FR)
@@ -77,9 +78,13 @@ function formatMe() {
         lyr=lyr.replace(/[:;] /gi, ', '); // FR-punctuation
         lyr=lyr.replace(/, (\S)?/g, function($0,$1){return ", " + $1.toLowerCase();});
         break;
+      case 'lt':
+        lyr=lyr.replace(/([.!?] )(\S)/g, function($0,$1,$2){return $1 + $2.toUpperCase();}); //IniCap, following (.!?)
+        lyr=lyr.replace(/ [—-] /g,' – '); // dash → en-dash
+        break;
       case 'ru':
         lyr=lyr.replace(/([.!?] )(\S)/g, function($0,$1,$2){return $1 + $2.toUpperCase();}); //IniCap, following (.!?)
-        lyr=lyr.replace(/ [–-] /g,' — '); // dash → em-dash
+        lyr=lyr.replace(/ [-–] /g,' — '); // dash → em-dash
     }
     if (chkBacks.checked){
       lyr=lyr.replace(/(\w*[!?]) +\(('?\S)/g, function($0,$1,$2){return $1 + ' (' + $2.toUpperCase();}); //Back-vocals after !&? → IniCap
@@ -105,7 +110,7 @@ function getTaskLink(alink){
     if (m){
       mxmID.value=m[1];
     }
-    m = alink.match(/&track_id=(.{22})/i);
+    m = alink.match(/&track_id=(.*)/i);
     if (m){
       spotID.value=m[1];
     }
@@ -123,13 +128,17 @@ function getTaskLink(alink){
     taskUrl.removeAttribute('href');
   }
   else{
-    /*
-    if (!theTaskLink.includes('&mode=edit&player=spotify')){
-      theTaskLink += '&mode=edit&player=spotify';
+   
+    if (taskUrl.textContent=='editLink'){
+      if (!theTaskLink.includes('&mode=edit&player=spotify')){
+        theTaskLink += '&mode=edit&player=spotify';
+      }
     }
-    */
-    
-    theTaskLink = theTaskLink.replace(/&track_id=(.{22})/g,"") + '&track_id=' + spotID.value;
+    theTaskLink = theTaskLink.replace("&player=amazon","&player=spotify").replace(/&track_id=(.*)/g,"") + '&track_id=' + spotID.value;
+    if (!theTaskLink.includes('&player=spotify')){
+      theTaskLink += '&player=spotify';
+    }
+
     taskUrl.setAttribute('href', theTaskLink);
   }
 }
@@ -176,6 +185,7 @@ function getDrop(event) {
           <option value="fr">FR</option>
           <option value="fr1">fr</option>
           <option value="ru">RU</option>
+          <option value="lt">LT</option>
         </select>
         <Button id = "lyrBckwrds" onclick="DoBackwards()" title="Backwards text">Bckwrd</Button>
         <label for="chkBacks">FixBacks</label>

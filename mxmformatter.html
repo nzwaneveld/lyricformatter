@@ -61,6 +61,7 @@ function formatMe() {
     lyr=lyr.replace(/(\w*?)( *[—.–,:;-]* *)*\n/g, "$1\n");//-EOL punctuation
     lyr=lyr.replace(/([^.])\.\. /g, "$1... "); //2dots → 3dots
     lyr=lyr.replace(/([,;])([^ ."?!\d)])/g, "$1 $2"); // +missing spaces
+    lyr=lyr.replace(/\[(refrain) *\d*\]/gi, "#HOOK"); // [Refrain] → #HOOK
     lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, function($0,$1){return "#" + $1.toUpperCase();});
    
     switch (cmbLang.value){

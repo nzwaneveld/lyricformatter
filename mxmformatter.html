@@ -62,6 +62,7 @@ function formatMe() {
     lyr=lyr.replace(/([^.])\.\. /g, "$1... "); //2dots → 3dots
     lyr=lyr.replace(/([,;])([^ ."?!\d)])/g, "$1 $2"); // +missing spaces
     lyr=lyr.replace(/\[(refrain) *\d*\]/gi, "#HOOK"); // [Refrain] → #HOOK
+    lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, "[$1]"); // Remove numbers and extra info from tag
     lyr=lyr.replace(/\[(verse|chorus|Bridge|Pre-Chorus|intro|outro) *\d*\]/gi, function($0,$1){return "#" + $1.toUpperCase();});
    
     switch (cmbLang.value){

@@ -1,0 +1,120 @@
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1257"/>
+<meta name="Author" content="Nico Zwaneveld"/>
+<meta name="Version" content="1.0">
+<meta http-equiv=”date” content="28/04/2022"/>
+<meta http-equiv=”last-modified” content="28/04/2022" />
+<Title>Convert MXM to LyricFind LRC</Title>
+<style>
+  body  {background-color: #EAEAE0;color: #3F3A3A;font-family: helvetica, arial;margin:1;}
+  textarea {border:"none"; width: 100%; height:100%;}
+  th {background-color: #DADAD0; padding-left:1px; }
+  td {height:100%;}
+  label {font-weight: normal; font-size: small;padding-left:0;text-align:left;}
+  span.right {float: right; padding:1 2 0 1;}
+  span.left {float: left; padding:1 1 0 2;}
+</style>
+
+<script type= "text/javascript">
+var lyrBox;
+var lyrHead;
+var theTaskLink;
+const strInfo = 'THE FUNCTION:\n \nThis tool converts MXM formatted lyrics text + timestamps into the LRC format accepted by LyricFind. \n \n \n \nHOW TO USE THIS TOOL:\n \nDrag any MXM formatted lyrics text, plus timestamps, into the text area for conversion into the LRC format that is used by LyricFind. The converted text is copied to the clipboard.\n'
+
+function initMe() {
+  lyrBox = document.getElementById("lyricsBox");
+  lyrHead = document.getElementById("lyrHead");
+}
+
+function showInfo() {
+  lyrBox.value =strInfo;
+}
+
+
+function formatMe() {
+ if (lyrBox){ 
+    var lyr = "\n" + lyrBox.value.trim() + "\n";
+    lyr=lyr.replace(/\n */g,"\n"); // Indent removal	
+    lyr=lyr.replace(/\n\d+\. */g,"\n"); // Initial #n. removal
+    lyr=lyr.replace(/[!]+/g,"!"); //Multiple ! fix
+    lyr=lyr.replace(/[?]+/g,"?"); //Multiple ? fix
+    lyr=lyr.replace(/ {2,}/g," "); //Multiple spaces fix
+    lyr=lyr.replace(/ /g," "); //Non-breaking space → space
+    lyr=lyr.replace(/\n\(?"?'?\S/g, function($0){return $0.toUpperCase();}); //Sentence-case formattting
+    lyr=lyr.replace(/ +([.,!?;])/g, "$1");//-space(s), preceding punctuation
+    lyr=lyr.replace(/[’´`‘]/g,"'"); //curly single apostrophe → typographic '
+    lyr=lyr.replace(/[„“”«»]/g,'"'); //curly double apostrophe → typographic "
+    lyr=lyr.replace(/\u2026/g,"..."); //Unicode ellipsis → "..."
+    lyr=lyr.replace(/(\w*?)( *[—.–,:;-]* *)*\n/g, "$1\n");//-EOL punctuation
+    lyr=lyr.replace(/([^.])\.\. /g, "$1... "); //2dots → 3dots
+    lyr=lyr.replace(/([,;])([^ ."?!\d)])/g, "$1 $2"); // +missing spaces
+    lyr=lyr.replace(/\nIntro/gi,"\n\n"); // Remove #Intro label and leave blank line
+    lyr=lyr.replace(/\nVerse\n/gi,"\n\n"); // Remove #VERSE label and leave blank line
+    lyr=lyr.replace(/\nBridge\n/gi,"\n\n"); // Remove #BRIDGE label and leave blank line
+    lyr=lyr.replace(/\nHook\n/gi,"\n\n"); // Remove #HOOK label and leave blank line
+    lyr=lyr.replace(/\nPre-Chorus\n/gi,"\n\n"); // Remove #PRE-CHORUS label and leave blank line
+    lyr=lyr.replace(/\nChorus\n/gi,"\n\n"); // Remove #CHORUS label and leave blank line
+    lyr=lyr.replace(/\nInstrumental\n/gi,"\n\n"); // Remove #INSTRUMENTAL label and leave blank line
+    lyr=lyr.replace(/\nOutro\n/gi,"\n\n"); // Remove #OUTRO label and leave blank line
+	lyr=lyr.replace(/(\d\d:\d\d.\d\d)( 0123456789 *)*/g, "[$1]"); // Timestamp
+	lyr=lyr.replace(/\u005D\n/gi,"]"); // Remove EOL after ] 
+    lyr=lyr.replace(/\n\n\n/gi,"\n\n"); // 3xEOL  removal
+	lyr=lyr.replace(/\n\n\n\n/gi,"\n\n"); // 4xEOL  removal
+
+
+    lyrBox.value =lyr.trim();
+    lyrBox.onfocus = function () {
+      lyrBox.select();
+      lyrBox.onfocus = undefined;
+    } 
+    lyrBox.focus(); 
+    document.execCommand("Copy", false, null);
+  }
+}
+
+function getTaskLink(alink){
+}
+
+function getDrop(event) {
+  const data = event.dataTransfer.getData("text/plain");
+  if (data.startsWith('https')){
+    if (togUrl.checked){getTaskLink(data);}
+  }
+  else{
+    lyrHead.focus();
+    lyrBox.value=data;
+    formatMe();
+  }
+  event.preventDefault();
+}
+
+</script>
+</HEAD>
+<BODY onload="initMe()">
+<table height ="100%" width = 100%>
+  <tr>
+    <th>
+      Convert MXM to LyricFind LRC
+      <span class="right">
+      <Button id = "lyrHead" onclick="showInfo()" title="Help">?</Button>
+      </span>
+    </th>
+  </tr>
+  <tr>
+    <th>
+      <span id="linkDiv" name="linkDiv" class="left" style="display:none;">
+      </span>
+      <span class="right">
+      </span>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <textarea id ="lyricsBox" ondrop = "getDrop(event)">
+      </textarea> 
+    </td>
+  </tr>
+</table>
+</BODY>
+</HTML>

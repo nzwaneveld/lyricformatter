@@ -1,15 +1,15 @@
 <HTML>
 <HEAD>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1257"/>
-<meta name="Author" content="Vincas Stepankevičius"/>
-<meta name="Version" content="5.4">
+<meta name="Author" content="Nico Zwaneveld - modified code originally by Vincas Stepankevičius"/>
+<meta name="Version" content="1.0">
 <meta http-equiv=”date” content="29/03/2021"/>
-<meta http-equiv=”last-modified” content="29/10/2021" />
+<meta http-equiv=”last-modified” content="29/04/2022" />
 <Title>Genius lyrics formatter</Title>
 <style>
-  body  {background-color: #EAEAE0;color: #3F3A3A;font-family: helvetica, arial;margin:1;}
+  body  {background-color: #F7F1C1;color: #3F3A3A;font-family: helvetica, arial;margin:1;}
   textarea {border:"none"; width: 100%; height:100%;}
-  th {background-color: #DADAD0; padding-left:1px; }
+  th {background-color: #EFE484; padding-left:1px; }
   td {height:100%;}
   label {font-weight: normal; font-size: small;padding-left:0;text-align:left;}
   span.right {float: right; padding:1 2 0 1;}
@@ -20,7 +20,7 @@
 var lyrBox;
 var lyrHead;
 var theTaskLink;
-const strInfo = '1. The main function - formatting MXM formatted lyrics text according to Genius guidelines. Drag any MXM formatted lyrics text here to be autoformatted for Genius and copied to the clipboard.\nUse "Lang" selector to switch between different language-dependent rule-sets.\nBe careful while selecting "Fix backing vocals" checkbox - initial proper names may be lowercased.\n\n2. Rarities: button "Bckwrd" may be used for text backwards-masking.'
+const strInfo = 'The main function - converts MXM formatted lyrics text to basic Genius guidelines. Drag any MXM formatted lyrics text here to be autoformatted for Genius and copied to the clipboard.\nUse "Lang" selector to switch between different language-dependent rule-sets (but should not be needed if lyrics already are compliabt with MXM guidelines).\nBe careful while selecting "Fix backing vocals" checkbox - initial proper names may be lowercased (again... if lyrics are compliant with MXM guidelines, then this finction is not needed).\n\n2. Rarities: button "Bckwrd" may be used for text backwards-masking.'
 
 function initMe() {
   lyrBox = document.getElementById("lyricsBox");

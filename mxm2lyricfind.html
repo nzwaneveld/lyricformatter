@@ -57,19 +57,37 @@ function formatMe() {
     lyr=lyr.replace(/\nChorus\n/gi,"\n\n"); // Remove #CHORUS label and leave blank line
     lyr=lyr.replace(/\nInstrumental\n/gi,"\n\n"); // Remove #INSTRUMENTAL label and leave blank line
     lyr=lyr.replace(/\nOutro\n/gi,"\n\n"); // Remove #OUTRO label and leave blank line
-	lyr=lyr.replace(/(\d\d:\d\d.\d\d)( 0123456789 *)*/g, "[$1]"); // Timestamp
-	lyr=lyr.replace(/\u005D\n/gi,"]"); // Remove EOL after ] 
+	  lyr=lyr.replace(/(\d\d:\d\d.\d\d)( 0123456789 *)*/g, "[$1]"); // Timestamp
+	  lyr=lyr.replace(/\u005D\n/gi,"]"); // Remove EOL after ] 
     lyr=lyr.replace(/\n\n\n/gi,"\n\n"); // 3xEOL  removal
-	lyr=lyr.replace(/\n\n\n\n/gi,"\n\n"); // 4xEOL  removal
-
+	  lyr=lyr.replace(/\n\n\n\n/gi,"\n\n"); // 4xEOL  removal
+  
 
     lyrBox.value =lyr.trim();
     lyrBox.onfocus = function () {
       lyrBox.select();
       lyrBox.onfocus = undefined;
     } 
+    // lyrBox.focus(); 
+    // document.execCommand("Copy", false, null);
+    var arrayValues = lyrBox.value.split(/\n/g);
+    
+    //console.log(arrayValues.length);
+    
+    for (let i = 0; i < arrayValues.length; i++) {
+       if (arrayValues[i].substring(0, 1) != "[") {
+       		// console.log(arrayValues[i]); // see line that triggered in console
+  	 	 		arrayValues[i] = "";
+			 };//
+    }
+
+    lyrBox.value =arrayValues.join("\n");
+    lyr =lyrBox.value.trim();
+    lyr=lyr.replace(/\n\n/gi,"\n"); // 2xEOL  removal
+    lyrBox.value =lyr.trim();
+    
     lyrBox.focus(); 
-    document.execCommand("Copy", false, null);
+    document.execCommand("Copy", false, null); // test
   }
 }
 
@@ -111,10 +129,10 @@ function getDrop(event) {
   </tr>
   <tr>
     <td>
-      <textarea id ="lyricsBox" ondrop = "getDrop(event)">
-      </textarea> 
+      <textarea id ="lyricsBox" ondrop = "getDrop(event)"></textarea> 
     </td>
   </tr>
 </table>
+<input type="button" id="btnRefresh" value="Convert MXM > LRC" onclick="formatMe();" />
 </BODY>
 </HTML>
